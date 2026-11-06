@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f1e8">
+<title>八字 · 命理解读</title>
+<style>
+:root{--paper:#f5f1e8;--card:#fffdf8;--ink:#241f1a;--ink2:#4a423a;--muted:#847768;
+--line:#e2d9c9;--accent:#a3342a;--gold:#a8843c;--green:#4a6b4a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.75;
+font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+padding-bottom:env(safe-area-inset-bottom)}
+.serif{font-family:"Songti SC","SimSun",Georgia,serif}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 80px}
+h1{font-size:19px;letter-spacing:.14em;margin:6px 0 2px;color:var(--accent);font-weight:600}
+.sub{font-size:11.5px;color:var(--muted);letter-spacing:.08em;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:14px;
+box-shadow:0 1px 2px rgba(60,45,25,.05)}
+.card h3{margin:0 0 10px;font-size:14.5px;letter-spacing:.06em;font-weight:600}
+label{display:block;font-size:11.5px;color:var(--muted);letter-spacing:.06em;margin:11px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;
+color:var(--ink);font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--gold)}
+.row{display:flex;gap:8px;margin-top:8px}.row>*{flex:1}
+button{width:100%;padding:12px;border:0;border-radius:4px;background:var(--accent);color:#fff;font-size:15px;
+letter-spacing:.12em;font-family:inherit;margin-top:14px;cursor:pointer}
+button.sec{background:#4a4238}
+button.mini{width:auto;padding:7px 14px;font-size:12.5px;letter-spacing:.06em;margin:8px 6px 0 0}
+button:disabled{opacity:.55}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.7;margin-top:10px}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin-top:6px}
+.pillar{background:#fdfaf3;border:1px solid var(--line);border-radius:4px;padding:10px 3px}
+.pillar .pos{font-size:10.5px;color:var(--muted);letter-spacing:.14em}
+.pillar .gz{font-family:"Songti SC",serif;font-size:27px;line-height:1.35;margin:2px 0}
+.pillar .gz .z{color:var(--accent)}
+.pillar .t{font-size:10.5px;color:var(--muted);margin-top:2px}
+.pillar .ss{font-size:10.5px;color:var(--gold)}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
+.bar .n{width:34px;flex:0 0 34px;color:var(--ink2)}
+.bar .track{flex:1;height:7px;background:#eee6d6;border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,var(--gold),#c9a45f)}
+.bar .val{width:34px;text-align:right;color:var(--muted);font-size:12px}
+.kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.kv span{font-size:12.5px;background:#f7f2e7;border:1px solid var(--line);border-radius:3px;padding:4px 9px}
+.sec-title{font-size:12px;color:var(--muted);letter-spacing:.2em;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+.ins{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--card);border-radius:3px;
+padding:12px 14px;margin-bottom:9px}
+.ins .txt{font-size:15px;line-height:1.8}
+.ins .bs{font-size:11.5px;color:var(--muted);margin-top:6px}
+.bio p{font-size:15px;line-height:1.95;margin:0 0 12px}
+.bio h4{font-size:13px;color:var(--accent);letter-spacing:.1em;margin:20px 0 8px}
+.tag{display:inline-block;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-left:6px}
+.err{color:var(--accent);font-size:12.5px;margin-top:8px}
+.ok{color:var(--green)}
+#gate{position:fixed;inset:0;background:var(--paper);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="serif">八　字</h1>
+  <div class="sub">命理解读 · 纯本地运行，数据不上传</div>
+
+  <!-- 模型设置 -->
+  <div class="card" id="cfgcard">
+    <h3>① 模型设置<span class="tag">只存在你自己的手机里</span></h3>
+    <label>API Key</label>
+    <input id="key" type="password" placeholder="sk-..." autocomplete="off">
+    <div class="row">
+      <div><label>接口地址</label><input id="base" value="https://api.deepseek.com/v1"></div>
+    </div>
+    <div class="row"><div><label>模型名</label><input id="model" value="deepseek-chat"></div></div>
+    <button class="mini sec" id="savecfg">保存设置</button>
+    <button class="mini sec" id="clearcfg">清除</button>
+    <div class="hint" id="cfginfo">没有 key 就填下面这张表，申请地址 platform.deepseek.com</div>
+  </div>
+
+  <!-- 出生信息 -->
+  <div class="card">
+    <h3>② 出生信息</h3>
+    <label>称呼（不必真名）</label>
+    <input id="name" value="阿禾">
+    <div class="row">
+      <div><label>性别</label><select id="gender"><option>女</option><option>男</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>出生日期（公历）</label><input id="date" type="date" value="1992-08-17"></div>
+      <div><label>出生时间</label><input id="time" type="time" value="10:20"></div>
+    </div>
+    <label>出生地</label>
+    <input id="city" list="cities" value="上海" placeholder="城市名">
+    <datalist id="cities"></datalist>
+    <div class="row">
+      <div><label>或者直接填经度（东经为正）</label><input id="lon" placeholder="留空则按城市查"></div>
+    </div>
+    <div class="hint" id="geoinfo"></div>
+    <button id="paipan">排　盘</button>
+  </div>
+
+  <div id="chart"></div>
+
+  <div id="actions" style="display:none">
+    <div class="card">
+      <h3>③ 生成解读</h3>
+      <button id="genopen" class="sec">先来八句开场</button>
+      <button id="genrepo" style="margin-top:8px">生成完整解读</button>
+      <div class="hint" id="prog"></div>
+    </div>
+  </div>
+
+  <div id="opening"></div>
+  <div id="report"></div>
+
+  <div class="hint" style="text-align:center;margin-top:28px">
+    基于传统命理符号体系，是一种理解自己的角度，不是对未来的判决。<br>
+    如果你最近情绪持续低落、影响生活，请找专业的人聊聊。
+  </div>
+</div>
+
+<script src="lunar.js"></script>
+<script src="engine.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let CHART = null;
+
+/* 代理地址：填上之后，使用者不用填 key，key 藏在代理服务里
+ * 例：const PROXY = "https://bazi-proxy.你的子域.workers.dev/v1";
+ * 留空 = 每个使用者填自己的 key（默认） */
+const PROXY = "";
+
+/* ---------- 配置 ---------- */
+function loadCfg(){
+  try{ return JSON.parse(localStorage.getItem("bazi_cfg") || "{}"); }catch(e){ return {}; }
+}
+function applyCfg(){
+  const c = loadCfg();
+  if(c.key) $("#key").value = c.key;
+  if(c.base) $("#base").value = c.base;
+  if(c.model) $("#model").value = c.model;
+  $("#cfginfo").innerHTML = c.key
+    ? `<span class="ok">已保存 ${esc(c.key.slice(0,6))}…</span> · 只存在本机浏览器`
+    : "没有 key 就填一下，申请地址 platform.deepseek.com";
+}
+$("#savecfg").onclick = () => {
+  localStorage.setItem("bazi_cfg", JSON.stringify({
+    key: $("#key").value.trim(), base: $("#base").value.trim(), model: $("#model").value.trim()
+  }));
+  applyCfg();
+};
+$("#clearcfg").onclick = () => { localStorage.removeItem("bazi_cfg"); $("#key").value=""; applyCfg(); };
+
+/* ---------- 城市表 ---------- */
+$("#cities").innerHTML = Object.keys(BaziEngine.CITIES).map(c => `<option value="${c}">`).join("");
+$("#city").oninput = () => {
+  const n = $("#city").value.trim();
+  const c = BaziEngine.CITIES[n];
+  $("#geoinfo").textContent = c ? `经度 ${c[0]}°E / 纬度 ${c[1]}°N` : "城市不在内置表里，可手动填经度";
+};
+
+/* ---------- 排盘 ---------- */
+$("#paipan").onclick = () => {
+  const d = $("#date").value, t = $("#time").value || "12:00";
+  if(!d){ alert("请填出生日期"); return; }
+  const [y,m,dd] = d.split("-").map(Number);
+  const [hh,mm] = t.split(":").map(Number);
+  const lon = $("#lon").value.trim();
+  CHART = BaziEngine.compute({
+    name: $("#name").value.trim() || "你", gender: $("#gender").value,
+    y, m, d: dd, hh, mm, city: $("#city").value.trim(),
+    lon: lon === "" ? null : Number(lon), solarTime: true
+  });
+  renderChart();
+  $("#actions").style.display = "block";
+  $("#opening").innerHTML = ""; $("#report").innerHTML = "";
+  window.scrollTo({top: $("#chart").offsetTop - 10, behavior: "smooth"});
+};
+
+function renderChart(){
+  const c = CHART, g = BaziEngine.geju(c), dys = BaziEngine.dayunThemes(c);
+  const pos = ["年","月","日","时"];
+  const maxW = Math.max(...Object.values(c.element_score));
+  const bars = Object.entries(c.element_score).map(([k,v]) =>
+    `<div class="bar"><div class="n">${k}</div><div class="track"><div class="fill" style="width:${(v/maxW*100).toFixed(0)}%"></div></div><div class="val">${v}</div></div>`).join("");
+  $("#chart").innerHTML = `
+  <div class="card">
+    <h3>${esc(c.name)} · ${esc(c.gender)} · ${esc(c.birth)}</h3>
+    <div class="hint">真太阳时校正 ${c.correction_min>0?"+":""}${c.correction_min} 分 · ${esc(c.geo_source)}</div>
+    <div class="pillars">${c.pillars.map((p,i)=>`
+      <div class="pillar"><div class="pos">${pos[i]}柱</div>
+      <div class="gz">${p[0]}<span class="z">${p[1]}</span></div>
+      <div class="t">藏 ${c.cang[i].join(" ")}</div>
+      <div class="ss">${c.shishen_gan[i]}</div></div>`).join("")}</div>
+    <div class="kv">
+      <span>日主 ${c.day_gan}（${c.strength_detail.day_element}）</span>
+      <span>身${c.strength}</span>
+      <span>${esc(g.base)}</span>
+      <span>有根 ${c.strength_detail.roots.join("、") || "无"}</span>
+    </div>
+  </div>
+  <div class="card"><h3>五行</h3>${bars}</div>
+  <div class="card"><h3>格局</h3>
+    <p style="margin:0">${esc(g.base)}：${esc(g.note)}</p>
+    <div class="hint">${esc(g.basis)}</div></div>
+  <div class="card"><h3>大运</h3>
+    ${dys.map(d=>`<p style="margin:6px 0;font-size:14px">${d.start_year}–${d.end_year}　<b>${d.ganzhi}</b>运　[${d.god}] ${d.theme}${d.current?' <span class="tag">当前</span>':''}</p>`).join("")}
+    <div class="hint">起运 ${c.qiyun.y} 年 ${c.qiyun.m} 个月，${c.qiyun.forward?"顺":"逆"}行</div></div>`;
+}
+
+/* ---------- 调模型 ---------- */
+async function callLLM(messages, maxTokens){
+  const c = loadCfg();
+  const base = (PROXY || c.base || "https://api.deepseek.com/v1").replace(/\/+$/,"");
+  if(!PROXY && !c.key) throw new Error("还没填 API Key");
+  const headers = {"Content-Type":"application/json"};
+  if(c.key) headers["Authorization"] = "Bearer " + c.key;   // 走代理时可以不填
+  const r = await fetch(base + "/chat/completions", {
+    method: "POST", headers,
+    body: JSON.stringify({
+      model: c.model || "deepseek-chat",
+      messages, temperature: 0.85, max_tokens: maxTokens || 3000,
+      response_format: {type:"json_object"}
+    })
+  });
+  if(!r.ok){
+    const t = await r.text();
+    throw new Error("接口返回 " + r.status + "：" + t.slice(0,160));
+  }
+  const j = await r.json();
+  let txt = j.choices?.[0]?.message?.content || "";
+  txt = txt.trim().replace(/^```(?:json)?/,"").replace(/```$/,"");
+  const a = txt.indexOf("{"), b = txt.lastIndexOf("}");
+  if(a >= 0 && b > a) txt = txt.slice(a, b+1);
+  try{ return JSON.parse(txt); }
+  catch(e){ throw new Error("模型返回的不是合法 JSON，请重试"); }
+}
+
+const OPEN_SYS = `你是命理师，正在准备见一个陌生人，手上有他的排盘。
+写开场的八句话：1-3 句身体，4-5 句感知（对声音、温度、人群、光线的反应），6-7 句性格（具体到动作），第 8 句一件已经发生过的事（只许过去，年份必须早于今年）。
+每句 30-55 字，能直接念出口。说出口的话里不许出现命理术语，术语只写在「据」里。
+不许说「你一定会」「你这辈子」，不许煽情。
+返回 JSON：{"开场":[{"类":"身体","话":"...","据":"..."}]}`;
+
+const SEC_SYS = `你在给一个普通人写一份关于他自己的解读。他不认识你，也没学过命理。
+语气：理性、克制、分析性。你在做结构分析，不是情感陪伴。
+每一节按这个顺序：说中 → 解释成「命」（把责任从人身上移到盘上） → 免除自责 → 给一个具体的口子。
+禁止诊断词（抑郁/焦虑症/双相/创伤）、禁止鸡汤（你值得被爱/接纳自己）、禁止「你一定会」。
+不用感叹号，不用排比。第二节到第八节各 500-800 字，其余 300-500 字。
+返回 JSON：{"节":[{"t":"小节标题","p":["段落1","段落2"]}]}`;
+
+function outline(){
+  return `【要写的小节，顺序不能变】
+1 你的底色：日主意象 + 五行最重最轻 + 身强弱意味着什么
+2 三方力量：十神里最重的一股代表什么、配比、格局名称的含义
+3 身体先知道：按五行偏枯与日主部位写出具体症状与习惯
+4 性格最拧处：具体到动作，不要形容词；若给了 MBTI 要做对照
+5 你遵守的规则：他心里那条没写出来的规则，它保护了什么、代价是什么
+6 困境与模式：痛点分三层；给这个心理模式起一个白话名字，说清它当年保护了他什么
+7 想要的与不敢要的：表层诉求 vs 深层需求
+8 被低估的东西：他已经在用但没当成能力的资源
+9 大运：每十年在演哪一出，指出他当前在哪一步
+10 换一个讲法 + 三件可以马上做的事`;
+}
+
+$("#genopen").onclick = async () => {
+  if(!CHART) return;
+  $("#prog").textContent = "正在写开场八句…";
+  $("#genopen").disabled = $("#genrepo").disabled = true;
+  try{
+    const j = await callLLM([
+      {role:"system", content: OPEN_SYS},
+      {role:"user", content: BaziEngine.facts(CHART) + "\n\n请写八句，带「据」。"}
+    ], 2000);
+    const list = j["开场"] || [];
+    $("#opening").innerHTML = `<div class="sec-title">开场八句</div>` + list.map(x =>
+      `<div class="ins"><div class="txt">${esc(x["话"])}</div>
+       ${x["据"] ? `<div class="bs">据：${esc(x["据"])}</div>` : ""}</div>`).join("");
+    $("#prog").textContent = "开场完成。";
+  }catch(e){ $("#prog").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  finally{ $("#genopen").disabled = $("#genrepo").disabled = false; }
+};
+
+$("#genrepo").onclick = async () => {
+  if(!CHART) return;
+  $("#genrepo").disabled = $("#genopen").disabled = true;
+  const facts = BaziEngine.facts(CHART);
+  const batches = [[1,2,3],[4,5,6],[7,8],[9,10]];
+  let html = `<div class="sec-title">完整解读</div><div class="card bio" id="biobox"></div>`;
+  $("#report").innerHTML = html;
+  const box = $("#biobox");
+  let all = "";
+  try{
+    for(let i=0;i<batches.length;i++){
+      $("#prog").textContent = `正在写第 ${i+1}/${batches.length} 批…（约 20 秒）`;
+      const j = await callLLM([
+        {role:"system", content: SEC_SYS},
+        {role:"user", content: facts + "\n\n" + outline() +
+          `\n\n这一批只写第 ${batches[i].join("、")} 节。id 与顺序照上面。`}
+      ], 6000);
+      (j["节"] || []).forEach(s => {
+        all += `<h4>${esc(s.t)}</h4>` + (s.p||[]).map(p => `<p>${esc(p)}</p>`).join("");
+      });
+      box.innerHTML = all;
+      $("#prog").textContent = `已完成 ${i+1}/${batches.length}`;
+    }
+    $("#prog").innerHTML = '<span class="ok">完成。可以截图或复制给朋友看。</span>';
+    $(".wrap").insertAdjacentHTML("beforeend",
+      `<button class="mini sec" onclick="copyAll()">复制全文</button>`);
+    window.__all = all;
+  }catch(e){ $("#prog").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  finally{ $("#genrepo").disabled = $("#genopen").disabled = false; }
+};
+
+function copyAll(){
+  const txt = $("#biobox").innerText;
+  navigator.clipboard.writeText(txt).then(()=>alert("已复制"), ()=>alert("复制失败，可长按选择"));
+}
+
+applyCfg();
+$("#city").oninput();
+if(PROXY){
+  $("#cfgcard").style.display = "none";
+  const b = document.querySelector("#paipan");
+  const tip = document.createElement("div");
+  tip.className = "hint";
+  tip.innerHTML = "已内置模型通道，无需填 key，直接填出生信息即可。";
+  b.parentNode.insertBefore(tip, b);
+}
+</script>
+</body>
+</html>
